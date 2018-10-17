@@ -1,0 +1,35 @@
+hostname acme-sea-nxos1
+!
+feature interface-vlan
+feature scp-server
+feature nxapi
+!
+no password strength-check
+username ignw password 5 $5$5h0TyPZ6$Bf2cvl7dMDTrCSStEbZqbVDaN0J0rMatzzC14W7uFQ3  rol
+e network-admin
+!
+ip domain-lookup
+ip domain-name ignw.io
+!
+ip route 0.0.0.0/0 10.255.255.1
+!
+vlan 1,1000
+vlan 1000
+  name routing_to_acme_sea_asa1
+!
+interface Vlan1000
+  description Routing to acme-sea-asa1
+  no shutdown
+  ip address 10.255.255.2/28
+!
+interface Ethernet1/2
+  switchport
+  no shutdown
+  description To acme-sea-asa1
+  switchport mode trunk
+  switchport trunk native vlan 1000
+!
+cli alias name wr copy run start
+line console
+line vty
+boot nxos bootflash:/nxos.7.0.3.I7.3.bin

@@ -1,0 +1,44 @@
+service timestamps debug datetime msec
+service timestamps log datetime localtime show-timezone
+service password-encryption
+!
+hostname acme-sea-rtr1
+!
+logging buffered 4096
+!
+clock timezone PST -8 0
+clock summer-time PDT recurring
+!
+no aaa new-model
+!
+ip domain name sea.ignw.io
+ip name-server 8.8.8.8
+ip name-server 8.8.4.4
+!
+username ignw privilege 15 password 0 ignw
+!
+interface GigabitEthernet2
+ description Link to acme-sea-asa1
+ ip address 203.0.113.1 255.255.255.192
+ negotiation auto
+ no shutdown
+!
+interface loopback8
+ ip address 8.8.8.8 255.255.255.255
+ no shut
+!
+no ip http server
+ip scp server enable
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+!
+ntp master 5
+ntp server 66.228.42.59 prefer
+ntp server 45.76.244.193
+ntp server 204.9.54.119
+ntp server 173.255.206.154
+!
+end
