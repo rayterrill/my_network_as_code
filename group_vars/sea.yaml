@@ -1,0 +1,34 @@
+timezone: PST
+timezone_offset: -8
+timezone_summer: PDT
+
+domain_name: sea.acme.io
+name_server_1: 8.8.8.8
+name_server_2: 8.8.4.4
+
+users: {
+    'ignw': {
+        'privilege': 15,
+        'password': 'ignw',
+        'role': 'network-admin'
+    }
+}
+
+ntp: {
+    '66.228.42.59': {
+        'prefer': true
+    },
+    '45.76.244.193': {
+        'prefer': false
+    },
+    '204.9.54.119': {
+        'prefer': false
+    },
+    '173.255.206.154': {
+        'prefer': false
+    }
+}
+
+username: ignw
+password: ignw
+enable_password: ignw

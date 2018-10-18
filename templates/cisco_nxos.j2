@@ -1,0 +1,66 @@
+hostname {{ inventory_hostname }}
+!
+{% for feature in features %}
+feature {{ feature }}
+{% endfor %}
+!
+no password strength-check
+{% for user, data in users.items() %}
+username {{ user }} password 0 {{ data.password }} role {{ data.role }}
+{% endfor %}
+!
+ip domain-lookup
+ip domain-name {{ domain_name }}
+!
+{% for context, data in routes.items() %}
+{% if context == 'default' %}
+{% for prefix, data in data.items() %}
+ip route {{ prefix }} {{ data.destination }}
+{% endfor %}
+{% else %}
+vrf context {{ context }}
+{% for prefix, data in data.items() %}
+  ip route {{ prefix }} {{ data.destination }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+!
+vlan 1
+{% for vlan, data in l2_vlans.items() %}
+vlan {{ vlan }}
+{% if data['name'] %}
+ name {{ data['name'] }}
+{% endif %}
+{% endfor %}
+!
+{% for interface, data in svi_interfaces.items() %}
+interface vlan{{ interface }}
+{% include 'generic/l3_interface_configs.j2' ignore missing %}
+ ip address {{ data.ip }} {{ data.mask }}
+ no shutdown
+{% endfor %}
+!
+{% for interface, data in l2_ethernet_interfaces.items() %}
+interface {{ interface }}
+{% include 'generic/l2_interface_configs.j2' ignore missing %}
+ switchport mode {{ data.mode }}
+{% if data.mode == 'trunk' %}
+{% if 'native_vlan' in data.keys() %}
+ switchport trunk native vlan {{ data['native_vlan'] }}
+{% endif %}
+{% if 'allowed_vlans' in data.keys() %}
+ switchport trunk allowed vlan {{ data['allowed_vlans'] }}
+{% endif %}
+{% elif data.mode == 'access' %}
+{% if 'access_vlan' in data.keys() %}
+ switchport access vlan {{ data['access_vlan'] }}
+{% endif %}
+{% endif %}
+ no shutdown
+!
+{% endfor %}
+!
+cli alias name wr copy run start
+line console
+line vty
+boot nxos bootflash:/nxos.7.0.3.I7.3.bin

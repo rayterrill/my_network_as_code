@@ -1,0 +1,59 @@
+---
+- name: Deploy Cisco IOS-XE Router Configurations
+  connection: local
+  hosts: cisco-ios-xe-routers
+  gather_facts: no
+  vars:
+    creds:
+      hostname: "{{ ansible_host }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      dev_os: "ios"
+  tags: ios-xe
+  tasks:
+    - napalm_install_config:
+        provider: "{{ creds }}"
+        config_file: "configs/{{ inventory_hostname }}"
+        commit_changes: True 
+        replace_config: False
+      register: napalm_diff
+    - debug:
+        msg: "{{ item }}"
+      with_items: "{{ napalm_diff.msg.split('\n') }}"
+- name: Deploy Cisco NX-OS Configurations
+  connection: local
+  hosts: cisco-nxos
+  gather_facts: no
+  vars:
+    creds:
+      hostname: "{{ ansible_host }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      dev_os: "nxos_ssh"
+  tags: nxos
+  tasks:
+    - napalm_install_config:
+        provider: "{{ creds }}"
+        config_file: "configs/{{ inventory_hostname }}"
+        commit_changes: True 
+        replace_config: False
+      register: napalm_diff
+    - debug:
+        msg: "{{ item }}"
+      with_items: "{{ napalm_diff.msg.split('\n') }}"
+- name: Deploy Cisco ASA Configurations
+  connection: local
+  hosts: cisco-asa
+  gather_facts: no
+  vars:
+    creds:
+      host: "{{ ansible_host }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      authorize: yes
+      auth_pass: "{{ enable_password }}"
+  tags: asa 
+  tasks:
+    - asa_config: 
+        provider: "{{ creds }}"
+        src: "configs//{{ inventory_hostname }}"

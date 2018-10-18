@@ -1,0 +1,34 @@
+hostname acme-sea-nxos1
+!
+feature interface-vlan
+feature scp-server
+feature nxapi
+!
+no password strength-check
+username ignw password 0 ignw role network-admin
+!
+ip domain-lookup
+ip domain-name sea.acme.io
+!
+ip route 0.0.0.0 0.0.0.0 10.255.255.1
+vrf context management
+  ip route 1.1.1.1 255.255.255.255 null0
+!
+vlan 1
+vlan 1000
+ name routing_to_acme_sea_asa1
+!
+interface vlan1000
+ ip address 10.255.255.2 255.255.255.240
+ no shutdown
+!
+interface Ethernet1/2
+ switchport mode trunk
+ switchport trunk native vlan 1000
+ no shutdown
+!
+!
+cli alias name wr copy run start
+line console
+line vty
+boot nxos bootflash:/nxos.7.0.3.I7.3.bin

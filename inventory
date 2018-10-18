@@ -1,0 +1,13 @@
+[sea]
+acme-sea-rtr1 ansible_host=10.0.0.5
+acme-sea-asa1 ansible_host=10.0.0.8
+acme-sea-nxos1 ansible_host=10.0.0.6
+
+[cisco-ios-xe-routers]
+acme-sea-rtr1
+
+[cisco-asa]
+acme-sea-asa1
+
+[cisco-nxos]
+acme-sea-nxos1

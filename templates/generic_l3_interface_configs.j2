@@ -1,0 +1,24 @@
+{% if 'description' in data.keys( )%}
+  description {{ data['description'] }}
+{% endif %}
+{% if 'redirects' in data.keys() %}
+{% if data['redirects'] == true %}
+  ip redirects
+{% elif data['redirects'] == false %}
+  no ip redirects
+{% endif %}
+{% endif %}
+{% if 'unreachables' in data.keys() %}
+{% if data['unreachables'] == true %}
+  ip unreachables
+{% elif data['unreachables'] == false %}
+  no ip unreachables
+{% endif %}
+{% endif %}
+{% if 'proxy-arp' in data.keys() %}
+{% if data['proxy-arp'] == true %}
+  ip proxy-arp
+{% elif data['proxy-arp'] == false %}
+  no ip proxy-arp
+{% endif %}
+{% endif %}

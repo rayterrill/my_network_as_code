@@ -1,0 +1,62 @@
+hostname {{ inventory_hostname }}
+!
+{% for interface, data in ethernet_interfaces.items() %}
+interface {{ interface }}
+{% include 'generic_l3_interface_configs.j2' ignore missing %}
+ nameif {{ data.nameif }}
+ security-level {{ data.security_level }}
+ ip address {{ data.ip }} {{ data.mask }}
+ no shutdown
+!
+{% endfor %}
+!
+nat (inside,outside) source dynamic any interface
+!
+{% for prefix, data in routes.items() %}
+route {{ data.nameif }} {{ prefix }} {{ data.destination }} 1
+{% endfor %}
+!
+user-identity default-domain LOCAL
+aaa authentication ssh console LOCAL
+aaa authentication http console LOCAL
+aaa authentication login-history
+!
+ssh stricthostkeycheck
+ssh 0.0.0.0 0.0.0.0 management
+ssh timeout 5
+ssh version 1 2
+ssh key-exchange group dh-group14-sha1
+!
+console timeout 0
+!
+{% for user, data in users.items() %}
+username {{ user }} password {{ data.password }} privilege {{ data.privilege }}
+{% endfor %}
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp
+  inspect h323 h225
+  inspect h323 ras
+  inspect rsh
+  inspect rtsp
+  inspect esmtp
+  inspect sqlnet
+  inspect skinny
+  inspect sunrpc
+  inspect xdmcp
+  inspect sip
+  inspect netbios
+  inspect tftp
+  inspect ip-options
+  inspect icmp

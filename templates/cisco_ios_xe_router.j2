@@ -1,0 +1,49 @@
+service timestamps debug datetime msec
+service timestamps log datetime localtime show-timezone
+service password-encryption
+!
+hostname {{ inventory_hostname }} 
+!
+logging buffered {{ logging_buff_size }} 
+!
+clock timezone {{ timezone }} {{ timezone_offset }} 0
+clock summer-time {{ timezone_summer }} recurring
+!
+no aaa new-model
+!
+ip domain name {{ domain_name }} 
+ip name-server {{ name_server_1 }} 
+ip name-server {{ name_server_2 }} 
+!
+{% for user, data in users.items() %}
+username {{ user }} privilege {{ data.privilege }} password 0 {{ data.password }} 
+{% endfor %}
+!
+{% for interface, data in ethernet_interfaces.items() %}
+interface {{ interface }} 
+{% include 'generic_l3_interface_configs.j2' ignore missing %}
+ ip address {{ data.ip }} {{ data.mask }} 
+ negotiation auto
+ no shutdown
+{% endfor %}
+!
+{% for interface, data in loopback_interfaces.items() %}
+interface loopback{{ interface }}
+ ip address {{ data.ip }} {{ data.mask }} 
+ no shut
+{% endfor %}
+!
+no ip http server
+ip scp server enable
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+!
+ntp master 5
+{% for server, data in ntp.items() %}
+ntp server {{ server }}{% if data['prefer'] == true %} prefer {% endif %} 
+{% endfor %}
+!
+end

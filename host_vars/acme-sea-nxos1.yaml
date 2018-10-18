@@ -1,0 +1,40 @@
+features:
+  - interface-vlan
+  - scp-server
+  - nxapi
+
+l2_vlans: {
+  '1000': {
+    'name': 'routing_to_acme_sea_asa1'
+  }
+}
+
+l2_ethernet_interfaces: {
+  'Ethernet1/2': {
+      'mode': 'trunk',
+      'native_vlan': 1000,
+      'description': 'toacme-sea-asa1'
+  }
+}
+
+svi_interfaces: {
+  '1000': {
+      'ip': '10.255.255.2',
+      'mask': '255.255.255.240',
+      'redirects': true,
+      'description': 'routingtoacme-sea-asa1'
+  }
+}
+
+routes: {
+  'default': {
+      '0.0.0.0 0.0.0.0': {
+          'destination': '10.255.255.1'
+      }
+  },
+  'management': {
+      '1.1.1.1 255.255.255.255': {
+          'destination': 'null0'
+      }
+  }
+}
