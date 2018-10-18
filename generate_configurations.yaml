@@ -1,4 +1,12 @@
 ---
+- name: Ensure Configs Directory Present
+  connection: local
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - file:
+        path: configs/
+        state: directory
 - name: Generate IOS-XE Router Configurations
   connection: local
   hosts: cisco-ios-xe-routers
